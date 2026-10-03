@@ -2,13 +2,13 @@ package rut.iuct.auditoriums.model;
 
 /** Тип аудитории: в БД хранится английское имя константы. */
 public enum AuditoriumType {
-    CLASSROOM("Кабинет"),
-    COMPUTER_CLASSROOM("Компьютерный класс"),
-    MULTIMEDIA_LECTURE_HALL("Лекционная мультимедийная"),
-    PRACTICAL_CLASSROOM("Аудитория практических занятий"),
-    SERVICE_ROOM("Служебная"),
-    SPECIAL_LABORATORY("Спецлаборатория"),
-    SPECIAL_PURPOSE_ROOM("Специальная");
+    CLASSROOM("Обычная аудитория"),
+    COMPUTER_CLASSROOM("Компьютерная аудитория"),
+    MULTIMEDIA_LECTURE_HALL("Мультимедийная лекционная аудитория"),
+    PRACTICAL_CLASSROOM("Аудитория для практических занятий"),
+    SERVICE_ROOM("Служебное помещение"),
+    SPECIAL_LABORATORY("Специализированная лаборатория"),
+    SPECIAL_PURPOSE_ROOM("Помещение специального назначения");
 
     private final String displayName;
 

@@ -1,0 +1,5 @@
+spring.datasource.url=jdbc:postgresql://localhost:5433/auditoriums_db
+spring.datasource.username=auditoriums
+spring.datasource.password=replace-with-your-password
+app.storage.root=./data/photos
+app.time-zone=Europe/Moscow

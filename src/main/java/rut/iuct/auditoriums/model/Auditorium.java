@@ -1,12 +1,18 @@
 package rut.iuct.auditoriums.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,15 +20,18 @@ import java.util.Set;
 /** Аудитория и связанное с ней имущество. */
 @Entity
 @Table(name = "auditorium")
-public class Auditorium {
+public class Auditorium extends AuditedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 255)
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false, columnDefinition = "auditorium_type")
@@ -31,91 +40,99 @@ public class Auditorium {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
+    @PositiveOrZero
     @Column(name = "capacity_students")
     private Integer capacityStudents;
 
+    @PositiveOrZero
     @Column(name = "capacity_students_extra")
     private Integer capacityStudentsExtra;
 
+    @PositiveOrZero
     @Column(name = "capacity_staff")
     private Integer capacityStaff;
 
+    @Size(max = 255)
     @Column(name = "building")
     private String building;
 
     @Column(name = "floor")
     private Integer floor;
 
+    @PositiveOrZero
     @Column(name = "area")
     private Double area;
 
+    /** Исторический признак; действующее наличие вычисляется по projector. */
     @Column(name = "has_projector")
     private Boolean hasProjector;
 
+    @Size(max = 255)
     @Column(name = "screen_size")
     private String screenSize;
 
     @Column(name = "has_ac")
     private Boolean hasAc;
 
+    /** Историческое число; действующее количество вычисляется по workstation. */
+    @PositiveOrZero
     @Column(name = "pc_count_manual")
     private Integer pcCountManual;
 
     @Column(name = "internet")
     private Boolean internet;
 
+    @Size(max = 255)
     @Column(name = "subnet")
     private String subnet;
 
     @Column(name = "in_schedule")
     private Boolean inSchedule;
 
+    @Size(max = 2048)
     @Column(name = "schedule_link", length = 2048)
     private String scheduleLink;
 
+    @Size(max = 2048)
     @Column(name = "actual_schedule_link", length = 2048)
     private String actualScheduleLink;
 
-    @Column(name = "last_modified")
-    private LocalDateTime lastModified;
-
-    @Column(name = "changed_by")
-    private String changedBy;
-
+    @Size(max = 2048)
     @Column(name = "equipment_issue", length = 2048)
     private String equipmentIssue;
 
-    /** Вычисляется SQL-запросом при загрузке сущности. */
-    @Formula("coalesce(capacity_students, 0) + coalesce(capacity_students_extra, 0)")
-    private Integer totalCapacityStudents;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "board_type", length = 16)
+    private BoardType boardType;
 
-    /** Количество сохранённых в БД рабочих мест аудитории. */
-    @Formula("(select count(*) from workstation w where w.auditorium_id = id)")
+    /** Вычисления отражают сохраненные активные записи при загрузке Entity. */
+    @Formula("(select count(*) from workstation w where w.auditorium_id = id and w.status = 'ACTIVE')")
     private Long pcCountAuto;
 
-    @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Formula("exists (select 1 from projector p where p.auditorium_id = id and p.status = 'ACTIVE')")
+    private boolean hasActiveProjector;
+
+    @Formula("exists (select 1 from printer p where p.auditorium_id = id and p.status = 'ACTIVE')")
+    private boolean hasActivePrinter;
+
+    @OneToMany(mappedBy = "auditorium")
     private List<AuditoriumPhoto> photos = new ArrayList<>();
 
-    @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "auditorium")
     private List<Projector> projectors = new ArrayList<>();
 
-    @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "auditorium")
     private List<Workstation> workstations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "auditorium")
     private List<Printer> printers = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "auditorium_department",
-            joinColumns = @JoinColumn(name = "auditorium_id"),
-            inverseJoinColumns = @JoinColumn(name = "department_id"))
-    private Set<Department> departments = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
 
-    @ManyToMany
-    @JoinTable(name = "auditorium_additional_equipment",
-            joinColumns = @JoinColumn(name = "auditorium_id"),
-            inverseJoinColumns = @JoinColumn(name = "additional_equipment_id"))
-    private Set<AdditionalEquipment> additionalEquipment = new HashSet<>();
+    @OneToMany(mappedBy = "auditorium", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AuditoriumAdditionalEquipment> additionalEquipmentLinks = new HashSet<>();
 
     public Auditorium() {
     }
@@ -147,7 +164,7 @@ public class Auditorium {
             List<Projector> projectors,
             List<Workstation> workstations,
             List<Printer> printers,
-            Set<Department> departments,
+            Department department,
             Set<AdditionalEquipment> additionalEquipment
     ) {
         this.id = id;
@@ -169,14 +186,14 @@ public class Auditorium {
         this.inSchedule = inSchedule;
         this.scheduleLink = scheduleLink;
         this.actualScheduleLink = actualScheduleLink;
-        this.lastModified = lastModified;
-        this.changedBy = changedBy;
+        setLastModified(lastModified);
+        setChangedBy(changedBy);
         this.equipmentIssue = equipmentIssue;
         setPhotos(photos);
         setProjectors(projectors);
         setWorkstations(workstations);
         setPrinters(printers);
-        setDepartments(departments);
+        setDepartment(department);
         setAdditionalEquipment(additionalEquipment);
     }
 
@@ -237,18 +254,24 @@ public class Auditorium {
     public String getActualScheduleLink() { return actualScheduleLink; }
     public void setActualScheduleLink(String actualScheduleLink) { this.actualScheduleLink = actualScheduleLink; }
 
-    public LocalDateTime getLastModified() { return lastModified; }
-    public void setLastModified(LocalDateTime lastModified) { this.lastModified = lastModified; }
-
-    public String getChangedBy() { return changedBy; }
-    public void setChangedBy(String changedBy) { this.changedBy = changedBy; }
-
     public String getEquipmentIssue() { return equipmentIssue; }
     public void setEquipmentIssue(String equipmentIssue) { this.equipmentIssue = equipmentIssue; }
 
-    public Integer getTotalCapacityStudents() { return totalCapacityStudents; }
+    public BoardType getBoardType() { return boardType; }
+    public void setBoardType(BoardType boardType) { this.boardType = boardType; }
+
+    @Transient
+    public Long getTotalCapacityStudents() {
+        if (capacityStudents == null || capacityStudentsExtra == null) return null;
+        return (long) capacityStudents + capacityStudentsExtra;
+    }
+
+    @AssertTrue(message = "Площадь должна быть конечным числом")
+    public boolean isAreaFinite() { return area == null || Double.isFinite(area); }
 
     public Long getPcCountAuto() { return pcCountAuto; }
+    public boolean getHasActiveProjector() { return hasActiveProjector; }
+    public boolean getHasActivePrinter() { return hasActivePrinter; }
 
     public List<AuditoriumPhoto> getPhotos() { return photos; }
 
@@ -269,9 +292,7 @@ public class Auditorium {
     }
 
     public void removePhoto(AuditoriumPhoto item) {
-        if (this.photos.remove(item)) {
-            item.setAuditorium(null);
-        }
+        this.photos.remove(item);
     }
 
     public List<Projector> getProjectors() { return projectors; }
@@ -293,9 +314,7 @@ public class Auditorium {
     }
 
     public void removeProjector(Projector item) {
-        if (this.projectors.remove(item)) {
-            item.setAuditorium(null);
-        }
+        this.projectors.remove(item);
     }
 
     public List<Workstation> getWorkstations() { return workstations; }
@@ -317,9 +336,7 @@ public class Auditorium {
     }
 
     public void removeWorkstation(Workstation item) {
-        if (this.workstations.remove(item)) {
-            item.setAuditorium(null);
-        }
+        this.workstations.remove(item);
     }
 
     public List<Printer> getPrinters() { return printers; }
@@ -341,25 +358,32 @@ public class Auditorium {
     }
 
     public void removePrinter(Printer item) {
-        if (this.printers.remove(item)) {
-            item.setAuditorium(null);
-        }
+        this.printers.remove(item);
     }
 
-    public Set<Department> getDepartments() { return departments; }
+    public Department getDepartment() { return department; }
+    public void setDepartment(Department department) { this.department = department; }
 
-    public void setDepartments(Set<Department> departments) {
-        Set<Department> replacement = departments == null ? new HashSet<>() : new HashSet<>(departments);
-        this.departments.clear();
-        this.departments.addAll(replacement);
+    public Set<AuditoriumAdditionalEquipment> getAdditionalEquipmentLinks() {
+        return Collections.unmodifiableSet(additionalEquipmentLinks);
     }
-
-    public Set<AdditionalEquipment> getAdditionalEquipment() { return additionalEquipment; }
 
     public void setAdditionalEquipment(Set<AdditionalEquipment> additionalEquipment) {
         Set<AdditionalEquipment> replacement = additionalEquipment == null ? new HashSet<>() : new HashSet<>(additionalEquipment);
-        this.additionalEquipment.clear();
-        this.additionalEquipment.addAll(replacement);
+        additionalEquipmentLinks.removeIf(link -> !replacement.contains(link.getAdditionalEquipment()));
+        for (AdditionalEquipment type : replacement) {
+            addAdditionalEquipment(type);
+        }
+    }
+
+    public void addAdditionalEquipment(AdditionalEquipment type) {
+        if (additionalEquipmentLinks.stream().noneMatch(link -> link.getAdditionalEquipment().equals(type))) {
+            additionalEquipmentLinks.add(new AuditoriumAdditionalEquipment(this, type));
+        }
+    }
+
+    public void removeAdditionalEquipment(AdditionalEquipment type) {
+        additionalEquipmentLinks.removeIf(link -> link.getAdditionalEquipment().equals(type));
     }
 
     /** Сущности сравниваются по назначенному базой идентификатору. */

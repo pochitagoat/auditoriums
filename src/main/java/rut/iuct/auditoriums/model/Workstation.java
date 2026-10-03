@@ -1,31 +1,39 @@
 package rut.iuct.auditoriums.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /** Рабочее место или ПК в аудитории. */
 @Entity
 @Table(name = "workstation")
-public class Workstation {
+public class Workstation extends WriteOffEquipment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 255)
     @Column(name = "pc_name")
     private String pcName;
 
+    @Size(max = 255)
     @Column(name = "monitors")
     private String monitors;
 
+    @Size(max = 255)
     @Column(name = "keyboards")
     private String keyboards;
 
+    @Size(max = 255)
     @Column(name = "mice")
     private String mice;
 
+    @Size(max = 255)
     @Column(name = "location_info")
     private String locationInfo;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "auditorium_id", nullable = false)
     private Auditorium auditorium;

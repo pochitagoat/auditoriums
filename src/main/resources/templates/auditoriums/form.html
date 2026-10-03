@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head(${editingId == null ? 'Добавить аудиторию' : 'Редактировать аудиторию'})}"></head>
+<body><div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main class="form-page">
+    <a class="back-link" th:href="${backUrl}">← Назад</a>
+    <div class="page-heading"><div><p class="eyebrow">КАТАЛОГ АУДИТОРИЙ</p><h1 th:text="${editingId == null ? 'Добавить аудиторию' : 'Редактировать аудиторию'}"></h1><p class="subtitle">Обязательные поля отмечены звездочкой. Неизвестные значения оставьте пустыми.</p></div></div>
+    <noscript th:replace="~{fragments/forms :: noscript}"></noscript>
+    <form class="panel editor" data-api-form data-kind="auditorium" th:attr="data-api=${editingId == null ? '/api/auditoriums' : '/api/auditoriums/' + editingId},data-method=${editingId == null ? 'POST' : 'PUT'},data-return-to=${returnTo}" data-confirm="Вы уверены, что хотите сохранить изменения?">
+        <h2>Основные сведения</h2><div class="form-grid">
+            <label th:replace="~{fragments/forms :: fieldInput('Название аудитории', 'name', ${form.name}, 'text', true, 255, null)}"></label>
+            <label class="field"><span>Тип аудитории *</span><select name="type" required><option value="">Выберите тип</option><option th:each="type : ${types}" th:value="${type}" th:text="${type.displayName}" th:selected="${type == form.type}"></option></select><span class="field-error" data-field-error="type"></span></label>
+            <label class="field"><span>Кафедра</span><select name="departmentId" data-type="number"><option value="">Не указано</option><option th:each="item : ${departments}" th:value="${item.id}" th:text="${item.name}" th:selected="${editingId != null and form.department != null and item.id == form.department.id}"></option></select><span class="field-error" data-field-error="departmentId"></span></label>
+            <label th:replace="~{fragments/forms :: text('Описание', 'description', ${form.description}, null)}"></label>
+        </div><h2>Расположение и вместимость</h2><div class="form-grid">
+            <label th:replace="~{fragments/forms :: fieldInput('Корпус', 'building', ${form.building}, 'text', false, 255, null)}"></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Этаж', 'floor', ${form.floor}, 'number', false, null, null)}"></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Площадь, м²', 'area', ${form.area}, 'number', false, null, 0)}"></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Студенческие места', 'capacityStudents', ${form.capacityStudents}, 'number', false, null, 0)}"></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Дополнительные места', 'capacityStudentsExtra', ${form.capacityStudentsExtra}, 'number', false, null, 0)}"></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Места для сотрудников', 'capacityStaff', ${form.capacityStaff}, 'number', false, null, 0)}"></label>
+        </div><h2>Оснащение помещения</h2><div class="form-grid">
+            <label class="field"><span>Доска</span><select name="boardType"><option value="">Не указано</option><option th:each="board : ${boards}" th:value="${board}" th:text="${@display.board(board)}" th:selected="${board == form.boardType}"></option></select><span class="field-error" data-field-error="boardType"></span></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Размер экрана', 'screenSize', ${form.screenSize}, 'text', false, 255, null)}"></label>
+            <label th:replace="~{fragments/forms :: bool('Кондиционер', 'hasAc', ${form.hasAc})}"></label>
+            <label th:replace="~{fragments/forms :: bool('Интернет', 'internet', ${form.internet})}"></label>
+            <label th:replace="~{fragments/forms :: bool('В расписании занятий', 'inSchedule', ${form.inSchedule})}"></label>
+            <label th:replace="~{fragments/forms :: fieldInput('Подсеть', 'subnet', ${form.subnet}, 'text', false, 255, null)}"></label>
+            <label th:replace="~{fragments/forms :: text('Проблемы с оборудованием', 'equipmentIssue', ${form.equipmentIssue}, 2048)}"></label>
+        </div>
+        <div th:replace="~{fragments/forms :: operation(${editingId == null ? null : form.version})}"></div>
+        <div class="form-actions"><button class="button primary" type="submit" disabled>Сохранить</button><a class="button" th:href="${backUrl}">Отмена</a></div>
+    </form>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></div></div></body></html>
+

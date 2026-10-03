@@ -1,25 +1,31 @@
 package rut.iuct.auditoriums.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /** Проектор, закреплённый за аудиторией. */
 @Entity
 @Table(name = "projector")
-public class Projector {
+public class Projector extends WriteOffEquipment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 255)
     @Column(name = "model")
     private String model;
 
+    @Size(max = 255)
     @Column(name = "mol")
     private String mol;
 
+    @Size(max = 255)
     @Column(name = "warehouse")
     private String warehouse;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "auditorium_id", nullable = false)
     private Auditorium auditorium;

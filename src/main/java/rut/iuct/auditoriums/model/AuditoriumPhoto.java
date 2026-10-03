@@ -1,25 +1,34 @@
 package rut.iuct.auditoriums.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-/** Фотография аудитории. В базе хранится только относительный путь. */
+/** Метаданные фотографии; фактические файлы обрабатывает файловое хранилище. */
 @Entity
 @Table(name = "auditorium_photo")
-public class AuditoriumPhoto {
+public class AuditoriumPhoto extends AuditedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 1024)
     @Column(name = "file_path", nullable = false, length = 1024)
     private String filePath;
 
+    @NotBlank
+    @Size(max = 255)
     @Column(name = "original_filename", nullable = false)
     private String originalFilename;
 
+    @Size(max = 255)
     @Column(name = "content_type")
     private String contentType;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "auditorium_id", nullable = false)
     private Auditorium auditorium;

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · Аудитории 360'">Аудитории 360</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script defer th:src="@{/js/app.js}"></script>
+</head>
+<body>
+<aside class="sidebar" th:fragment="sidebar">
+    <a class="brand" th:href="@{/}"><span class="brand-symbol" aria-hidden="true">А</span><span>Аудитории <b>360</b><small>Учет пространства и техники</small></span></a>
+    <span class="nav-caption">РАБОЧЕЕ ПРОСТРАНСТВО</span>
+    <nav aria-label="Основная навигация">
+        <a th:href="@{/auditoriums}" th:classappend="${section == 'catalog'} ? 'active'" th:attr="aria-current=${section == 'catalog' ? 'page' : null}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+            </svg>
+            <span>Каталог аудиторий</span>
+        </a>
+        <a th:href="@{/requests}" th:classappend="${section == 'requests'} ? 'active'" th:attr="aria-current=${section == 'requests' ? 'page' : null}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/>
+                <rect x="9" y="2" width="6" height="4" rx="1"/>
+                <path d="M8 10h8M8 14h8M8 18h5"/>
+            </svg>
+            <span>Заявки</span><span class="soon">Скоро</span>
+        </a>
+        <a th:href="@{/statistics}" th:classappend="${section == 'statistics'} ? 'active'" th:attr="aria-current=${section == 'statistics' ? 'page' : null}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 4v16h16M8 16v-5M12 16V7M16 16V4"/>
+            </svg>
+            <span>Статистика</span><span class="soon">Скоро</span>
+        </a>
+    </nav>
+    <span class="nav-caption">СПРАВОЧНИКИ</span>
+    <nav aria-label="Справочники">
+        <a th:href="@{/departments}" th:classappend="${section == 'catalogs'} ? 'active'">Кафедры</a>
+        <a th:href="@{/additional-equipment}">Типы оборудования</a>
+    </nav>
+    <div class="sidebar-note"><strong>Все сведения под рукой</strong><p>Аудитории, оснащение и фотографии в одном месте.</p></div>
+</aside>
+<header class="topbar" th:fragment="topbar">
+    <span>Аудиторный фонд</span><span class="topbar-label">Университет</span>
+</header>
+<footer th:fragment="footer"><span>Аудитории 360</span><a th:href="@{/auditoriums}">Каталог аудиторий</a></footer>
+</body>
+</html>
+

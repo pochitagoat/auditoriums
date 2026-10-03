@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head(${title})}"></head><body>
+<div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main>
+<div class="page-heading"><div><p class="eyebrow">АУДИТОРИИ 360</p><h1 th:text="${title}"></h1></div></div>
+<section class="panel empty-state placeholder"><span class="empty-symbol" aria-hidden="true">◷</span><span class="pill neutral">В планах</span><h2>Раздел появится позже</h2><p th:text="${description}"></p><a class="button primary" th:href="@{/auditoriums}">Перейти к аудиториям</a></section>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></div></div></body></html>
+

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Каталог аудиторий')}"></head>
+<body><div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace">
+<header th:replace="~{fragments/layout :: topbar}"></header>
+<main>
+    <div class="page-heading"><div><p class="eyebrow">ПРОСТРАНСТВА УНИВЕРСИТЕТА</p><h1>Каталог аудиторий</h1><p class="subtitle">Найдите аудиторию и проверьте ее оснащение.</p></div>
+        <a class="button primary" th:href="@{/auditoriums/new(returnTo=${listUrl})}">+ Добавить аудиторию</a></div>
+    <div class="notice success" th:if="${param.saved != null}">Изменения сохранены.</div>
+    <section class="panel search-panel" aria-label="Поиск и фильтры">
+        <form method="get" th:action="@{/auditoriums}" th:object="${filter}">
+            <div class="search-line"><label class="search-field"><span class="sr-only">Название аудитории</span><input type="search" name="q" th:value="*{q}" placeholder="Поиск по названию аудитории…"></label><button class="button primary" type="submit">Найти</button></div>
+            <div class="filter-line"><details class="filter-details"><summary>Фильтры</summary><div class="form-grid filters">
+                <label class="field"><span>Тип аудитории</span><select name="type"><option value="">Все типы</option><option th:each="type : ${types}" th:value="${type}" th:text="${type.displayName}" th:selected="${type == filter.type}"></option></select></label>
+                <label class="field"><span>Корпус</span><input name="building" th:value="*{building}" placeholder="Любой корпус"></label>
+                <label class="field"><span>Этаж</span><input name="floor" type="number" th:value="*{floor}" placeholder="Любой этаж"></label>
+                <label class="field"><span>Кафедра</span><select name="departmentId"><option value="">Все кафедры</option><option th:each="item : ${departments}" th:value="${item.id}" th:text="${item.name}" th:selected="${item.id == filter.departmentId}"></option></select></label>
+                <label class="field"><span>Доска</span><select name="boardType"><option value="">Любой тип</option><option th:each="board : ${boards}" th:value="${board}" th:text="${@display.board(board)}" th:selected="${board == filter.boardType}"></option></select></label>
+                <label th:replace="~{fragments/forms :: bool('Проектор', 'hasProjector', ${filter.hasProjector})}"></label>
+                <label th:replace="~{fragments/forms :: bool('Принтер', 'hasPrinter', ${filter.hasPrinter})}"></label>
+                <label th:replace="~{fragments/forms :: bool('Компьютеры', 'hasWorkstations', ${filter.hasWorkstations})}"></label>
+                <label th:replace="~{fragments/forms :: bool('Интернет', 'internet', ${filter.internet})}"></label>
+                <label th:replace="~{fragments/forms :: bool('Кондиционер', 'hasAc', ${filter.hasAc})}"></label>
+            </div></details><a class="text-link" th:href="@{/auditoriums}">Сбросить фильтры</a>
+            <label class="page-size">На странице <select name="size" th:field="*{size}"><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></label></div>
+        </form>
+    </section>
+    <section class="panel">
+        <div class="panel-heading"><h2>Аудитории <span class="count" th:text="${page.totalElements}">0</span></h2><span class="muted">Оснащение учитывает действующее оборудование</span></div>
+        <div class="table-scroll" th:if="${!page.content.empty}">
+            <table><thead><tr><th>Аудитория</th><th>Тип</th><th>Места</th><th>Проектор</th><th>Принтер</th><th>Компьютеры</th><th>Доска</th><th>Корпус</th><th>Этаж</th></tr></thead>
+            <tbody><tr th:each="item : ${page.content}">
+                <td><a class="room-link" th:href="@{/auditoriums/{id}(id=${item.id},returnTo=${listUrl})}" th:text="${item.name}"></a></td>
+                <td class="type-cell" th:text="${item.type.displayName}"></td><td th:text="${@display.value(item.capacityStudents)}"></td>
+                <td><span class="pill" th:classappend="${item.hasActiveProjector} ? 'positive' : 'neutral'" th:text="${item.hasActiveProjector ? 'Есть' : 'Нет'}"></span></td>
+                <td><span class="pill" th:classappend="${item.hasActivePrinter} ? 'positive' : 'neutral'" th:text="${item.hasActivePrinter ? 'Есть' : 'Нет'}"></span></td>
+                <td th:text="${item.activeWorkstationCount}"></td><td th:text="${@display.board(item.boardType)}"></td><td th:text="${@display.value(item.building)}"></td><td th:text="${@display.value(item.floor)}"></td>
+            </tr></tbody></table>
+        </div>
+        <div class="empty-state" th:if="${page.content.empty}"><span class="empty-symbol" aria-hidden="true">▦</span><h3>Аудитории не найдены</h3><p>Измените условия поиска или добавьте первую аудиторию.</p><a class="button" th:href="@{/auditoriums}">Открыть весь каталог</a></div>
+        <div class="pagination"><span class="muted" th:text="${'Найдено: ' + page.totalElements}"></span><nav aria-label="Страницы">
+            <a class="button small" th:if="${page.page > 0}" th:href="${previousUrl}">← Назад</a>
+            <span th:text="${'Страница ' + (page.page + 1) + ' из ' + (page.totalPages == 0 ? 1 : page.totalPages)}"></span>
+            <a class="button small" th:if="${page.page + 1 < page.totalPages}" th:href="${nextUrl}">Далее →</a>
+        </nav></div>
+    </section>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></div></div></body></html>
+

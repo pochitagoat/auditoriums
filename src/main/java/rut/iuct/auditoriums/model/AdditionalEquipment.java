@@ -1,16 +1,20 @@
 package rut.iuct.auditoriums.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /** Вид дополнительного оборудования. */
 @Entity
 @Table(name = "additional_equipment")
-public class AdditionalEquipment {
+public class AdditionalEquipment extends AuditedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 255)
     @Column(name = "name", nullable = false)
     private String name;
 

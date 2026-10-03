@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head(${title})}"></head><body>
+<div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main>
+<div class="page-heading"><div><p class="eyebrow">СПРАВОЧНИКИ</p><h1 th:text="${title}"></h1><p class="subtitle" th:text="${departmentCatalog ? 'Кафедры, за которыми закреплены аудитории.' : 'Типы оборудования для выбора в карточке аудитории.'}"></p></div><a class="button primary" th:href="${basePath + '/new'}" th:text="${departmentCatalog ? '+ Добавить кафедру' : '+ Добавить тип'}"></a></div>
+<div class="notice success" th:if="${param.saved != null}">Изменения сохранены.</div>
+<section class="panel"><div class="empty-state" th:if="${items.empty}"><h2>Справочник пока пуст</h2><p>Добавьте первую запись.</p></div>
+<div class="catalog-row" th:each="item : ${items}"><div><h2 th:text="${item.name}"></h2><p class="muted" th:text="${'Изменено: ' + @display.time(item.lastModified) + ' · ' + @display.value(item.changedBy)}"></p><p th:if="${departmentCatalog}" th:text="${@display.value(item.molLink)}"></p></div><a class="button small" th:href="${basePath + '/' + item.id + '/edit'}">Редактировать</a></div></section>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></div></div></body></html>
+

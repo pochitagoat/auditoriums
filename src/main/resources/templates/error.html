@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head('Не удалось открыть страницу')}"></head><body>
+<div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main>
+<section class="panel empty-state"><p class="eyebrow" th:text="${status}">404</p><h1>Не удалось открыть страницу</h1><p th:text="${message ?: 'Проверьте адрес и повторите попытку.'}"></p><a class="button primary" th:href="@{/auditoriums}">Вернуться к каталогу</a></section>
+</main></div></div></body></html>
+

@@ -1,0 +1,58 @@
+name: auditoriums-dev
+
+services:
+  app:
+    build: .
+    image: auditoriums:local
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: ""
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-auditoriums_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-auditoriums}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before starting Compose}
+      SPRING_PROFILES_ACTIVE: ${APP_PROFILE:-default}
+      PHOTO_STORAGE_ROOT: /app/photos
+      APP_TIME_ZONE: ${APP_TIME_ZONE:-Europe/Moscow}
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-8080}:8080"
+    volumes:
+      - photo_data:/app/photos
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/api/auditoriums"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-auditoriums_db}
+      POSTGRES_USER: ${POSTGRES_USER:-auditoriums}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before starting Compose}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  files:
+    image: alpine:3.22
+    profiles: ["tools"]
+    network_mode: none
+    volumes:
+      - photo_data:/photos
+      - ${BACKUP_DIRECTORY:-./backups}:/backup
+
+volumes:
+  postgres_data:
+  photo_data:

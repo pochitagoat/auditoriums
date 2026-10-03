@@ -1,19 +1,24 @@
 package rut.iuct.auditoriums.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /** Подразделение, связанное с аудиториями. */
 @Entity
 @Table(name = "department")
-public class Department {
+public class Department extends AuditedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 255)
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Size(max = 2048)
     @Column(name = "mol_link", length = 2048)
     private String molLink;
 

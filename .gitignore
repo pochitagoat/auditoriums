@@ -2,7 +2,13 @@ HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
-!**/src/test/**/target/
+AGENTS.md
+/application-local.properties
+/data/
+/backups/
+/.env
+/compose.*.local.yaml
+/scripts/__pycache__/
 
 ### STS ###
 .apt_generated

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head(${title})}"></head><body>
+<div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main class="form-page">
+<a class="back-link" th:href="${basePath}">← Назад к справочнику</a><div class="page-heading"><h1 th:text="${(editingId == null ? 'Добавить: ' : 'Редактировать: ') + title}"></h1></div>
+<noscript th:replace="~{fragments/forms :: noscript}"></noscript>
+<form class="panel editor" data-api-form th:attr="data-api=${'/api' + basePath + (editingId == null ? '' : '/' + editingId)},data-method=${editingId == null ? 'POST' : 'PUT'},data-success=${basePath + '?saved=1'}" data-confirm="Вы уверены, что хотите сохранить изменения?">
+<div class="form-grid"><label th:replace="~{fragments/forms :: fieldInput('Название', 'name', ${form.name}, 'text', true, 255, null)}"></label>
+<th:block th:if="${departmentCatalog}"><label th:replace="~{fragments/forms :: fieldInput('Ссылка на МОЛ', 'molLink', ${form.molLink}, 'text', false, 2048, null)}"></label></th:block></div>
+<div th:replace="~{fragments/forms :: operation(${editingId == null ? null : form.version})}"></div><div class="form-actions"><button class="button primary" type="submit" disabled>Сохранить</button><a class="button" th:href="${basePath}">Отмена</a></div></form>
+<details class="danger-zone" th:if="${editingId != null}"><summary>Удаление записи</summary><p>Запись можно удалить, если она не используется аудиториями.</p><form data-api-form data-method="DELETE" th:attr="data-api=${'/api' + basePath + '/' + editingId},data-success=${basePath + '?saved=1'}" data-confirm="Вы уверены, что хотите удалить запись?"><div th:replace="~{fragments/forms :: operation(${form.version})}"></div><button class="button danger" type="submit" disabled>Удалить запись</button></form></details>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></div></div></body></html>
+
