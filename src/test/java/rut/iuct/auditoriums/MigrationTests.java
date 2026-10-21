@@ -14,6 +14,36 @@ class MigrationTests extends PostgresTestSupport {
     @Autowired DataSource dataSource;
 
     @Test
+    void developmentSeedPopulatesOnlyAnEmptySchemaWithRepresentativeData() {
+        String schema = "seed_test_" + UUID.randomUUID().toString().replace("-", "");
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        try {
+            var flyway = Flyway.configure().dataSource(dataSource).schemas(schema).defaultSchema(schema)
+                    .locations("classpath:db/migration", "classpath:db/seed").load();
+
+            assertEquals(3, flyway.migrate().migrationsExecuted);
+            assertEquals(27, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".auditorium", Integer.class));
+            assertEquals(7, jdbc.queryForObject("SELECT count(DISTINCT type) FROM " + schema + ".auditorium", Integer.class));
+            assertEquals(5, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".department", Integer.class));
+            assertEquals(7, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".additional_equipment", Integer.class));
+            assertEquals(56, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".workstation", Integer.class));
+            assertEquals(14, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".projector", Integer.class));
+            assertEquals(10, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".printer", Integer.class));
+            int writtenOff = jdbc.queryForObject(
+                    "SELECT count(*) FROM " + schema + ".workstation WHERE status = 'WRITTEN_OFF'", Integer.class)
+                    + jdbc.queryForObject(
+                    "SELECT count(*) FROM " + schema + ".projector WHERE status = 'WRITTEN_OFF'", Integer.class)
+                    + jdbc.queryForObject(
+                    "SELECT count(*) FROM " + schema + ".printer WHERE status = 'WRITTEN_OFF'", Integer.class);
+            assertEquals(7, writtenOff);
+
+            flyway.migrate();
+            assertEquals(27, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".auditorium", Integer.class));
+            assertEquals(56, jdbc.queryForObject("SELECT count(*) FROM " + schema + ".workstation", Integer.class));
+        } finally { jdbc.execute("DROP SCHEMA IF EXISTS " + schema + " CASCADE"); }
+    }
+
+    @Test
     void upgradesPopulatedV1WithoutLosingHistoryTypesOrPhotoPathsAndRunsOnlyOnce() {
         String schema = "migration_test_" + UUID.randomUUID().toString().replace("-", "");
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
