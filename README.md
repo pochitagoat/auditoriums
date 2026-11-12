@@ -34,7 +34,7 @@ docker compose up -d --build --wait
 Copy-Item application-local.properties.example application-local.properties
 ```
 
-Укажите URL, пользователя и пароль БД в локальном файле. Пример использует порт `5433`; для своей PostgreSQL измените URL. БД из Compose можно запустить командой `docker compose up -d --wait postgres` с настроенным `.env`.
+Укажите URL, пользователя и пароль БД в локальном файле. Пример использует порт `5433` для БД из Compose. Для существующего контейнера `auditoriums-postgres` на порту `5432` задайте `jdbc:postgresql://localhost:5432/auditoriums_db`. БД из Compose можно запустить командой `docker compose up -d --wait postgres` с настроенным `.env`.
 
 ```powershell
 .\mvnw.cmd spring-boot:run
@@ -46,7 +46,7 @@ Copy-Item application-local.properties.example application-local.properties
 
 ## Данные и фотографии
 
-- Сид: [afterMigrate__development_seed.sql](src/main/resources/db/seed/afterMigrate__development_seed.sql). Профиль `APP_PROFILE=seed` для Compose или `SPRING_PROFILES_ACTIVE=seed` для Maven/IDE заполняет только пустую БД тремя аудиториями и оборудованием; по умолчанию выключен.
+- Сид: [afterMigrate__development_seed.sql](src/main/resources/db/seed/afterMigrate__development_seed.sql). Профиль `APP_PROFILE=seed` для Compose или `SPRING_PROFILES_ACTIVE=seed` для Maven/IDE заполняет только пустую БД: 27 аудиторий в трех корпусах, кафедры и разные виды оборудования; по умолчанию выключен.
 - Flyway применяет миграции при запуске. V2 сохраняет исторические данные, переносит связи кафедр и добавляет аудит, версии и статусы; V3 добавляет очередь очистки файлов. Примененные миграции не редактировать. Перед подключением старой БД сделайте копию БД и фотографий; автоматический baseline отключен.
 - Фото: JPG/JPEG/PNG до 10 000 000 байт. Локальное хранилище — `PHOTO_STORAGE_ROOT`, по умолчанию `./data/photos`; в Docker — `/app/photos` в volume `photo_data`. Перед сменой каталога остановите приложение и перенесите все файлы с сохранением относительных путей. Для старых абсолютных путей есть [утилита переноса](scripts/migrate_legacy_photos.py).
 

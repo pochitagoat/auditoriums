@@ -1,6 +1,10 @@
 -- afterMigrate__development_seed.sql
 -- Актуальные демонстрационные данные.
--- Очистка таблиц выполняется миграцией V4.
+-- Существующие данные не меняются; заполняется только пустая БД.
+
+LOCK TABLE auditorium, auditorium_department, department, additional_equipment,
+    workstation, projector, printer, auditorium_photo, auditorium_additional_equipment
+    IN ACCESS EXCLUSIVE MODE;
 
 DO $$
 DECLARE
@@ -8,6 +12,19 @@ DECLARE
         CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Moscow';
     seed_author CONSTANT TEXT := 'Демонстрационные данные';
 BEGIN
+    IF EXISTS (SELECT 1 FROM auditorium)
+        OR EXISTS (SELECT 1 FROM department)
+        OR EXISTS (SELECT 1 FROM additional_equipment)
+        OR EXISTS (SELECT 1 FROM workstation)
+        OR EXISTS (SELECT 1 FROM projector)
+        OR EXISTS (SELECT 1 FROM printer)
+        OR EXISTS (SELECT 1 FROM auditorium_photo)
+        OR EXISTS (SELECT 1 FROM auditorium_department)
+        OR EXISTS (SELECT 1 FROM auditorium_additional_equipment) THEN
+        RAISE NOTICE 'Development seed skipped: the database already contains application data.';
+        RETURN;
+    END IF;
+
     -- Кафедры.
     INSERT INTO department (name, last_modified, changed_by) VALUES
         ('Цифровые технологии управления транспортными процессами', seed_time, seed_author),
