@@ -33,7 +33,7 @@ public class AdditionalEquipmentLinkApiController {
     @DeleteMapping("/{additionalEquipmentId}")
     public ResponseEntity<Void> remove(@PathVariable @Positive(message = "Идентификатор должен быть положительным") Long auditoriumId,
             @PathVariable @Positive(message = "Идентификатор должен быть положительным") Long additionalEquipmentId,
-            @RequestParam String changedBy,
+            @RequestParam(required = false) String changedBy,
             @RequestParam @PositiveOrZero(message = "Версия не может быть отрицательной") Long version) {
         service.remove(auditoriumId, additionalEquipmentId, changedBy, version);
         return ResponseEntity.noContent().build();

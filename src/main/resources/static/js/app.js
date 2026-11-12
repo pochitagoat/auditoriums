@@ -50,6 +50,10 @@ for (const form of document.querySelectorAll('[data-api-form]')) {
                 options.body = JSON.stringify(payload(form));
             }
             const response = await fetch(url, options);
+            if (response.status === 401) {
+                location.assign('/login?required=1');
+                return;
+            }
             const body = response.status === 204 ? null : await response.json().catch(() => null);
             if (!response.ok) {
                 showErrors(form, body?.message || 'Не удалось выполнить операцию. Повторите попытку.', body?.fieldErrors);

@@ -5,7 +5,7 @@
 <header th:replace="~{fragments/layout :: topbar}"></header>
 <main>
     <div class="page-heading"><div><p class="eyebrow">ПРОСТРАНСТВА УНИВЕРСИТЕТА</p><h1>Каталог аудиторий</h1><p class="subtitle">Найдите аудиторию и проверьте ее оснащение.</p></div>
-        <a class="button primary" th:href="@{/auditoriums/new(returnTo=${listUrl})}">+ Добавить аудиторию</a></div>
+        <a class="button primary" th:if="${authenticated}" th:href="@{/auditoriums/new(returnTo=${listUrl})}">+ Добавить аудиторию</a><a class="button" th:unless="${authenticated}" th:href="@{/register}">Зарегистрируйтесь для редактирования</a></div>
     <div class="notice success" th:if="${param.saved != null}">Изменения сохранены.</div>
     <section class="panel search-panel" aria-label="Поиск и фильтры">
         <form method="get" th:action="@{/auditoriums}" th:object="${filter}">

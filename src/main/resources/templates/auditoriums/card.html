@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head(${'Аудитория ' + auditorium.name})}"></head><body>
-<div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main>
+<div class="app-shell"><aside th:replace="~{fragments/layout :: sidebar}"></aside><div class="workspace"><header th:replace="~{fragments/layout :: topbar}"></header><main th:classappend="${!authenticated} ? 'readonly'">
 <a class="back-link" th:href="${returnTo}">← Назад к списку</a>
-<div class="page-heading"><div><p class="eyebrow" th:text="${auditorium.type.displayName}"></p><h1 th:text="${'Аудитория ' + auditorium.name}"></h1><p class="subtitle" th:text="${'Корпус: ' + @display.value(auditorium.building) + ' · Этаж: ' + @display.value(auditorium.floor)}"></p></div><a class="button primary" th:href="@{/auditoriums/{id}/edit(id=${auditorium.id},returnTo=${returnTo})}">Редактировать аудиторию</a></div>
+<div class="page-heading"><div><p class="eyebrow" th:text="${auditorium.type.displayName}"></p><h1 th:text="${'Аудитория ' + auditorium.name}"></h1><p class="subtitle" th:text="${'Корпус: ' + @display.value(auditorium.building) + ' · Этаж: ' + @display.value(auditorium.floor)}"></p></div><a class="button primary" th:if="${authenticated}" th:href="@{/auditoriums/{id}/edit(id=${auditorium.id},returnTo=${returnTo})}">Редактировать аудиторию</a><a class="button" th:unless="${authenticated}" th:href="@{/register}">Зарегистрируйтесь для редактирования</a></div>
+<div class="notice warning" th:unless="${authenticated}">Чтобы изменять аудиторию или её оснащение, войдите в аккаунт или зарегистрируйтесь.</div>
 <div class="notice success" th:if="${param.saved != null}">Изменения сохранены.</div>
 <noscript th:replace="~{fragments/forms :: noscript}"></noscript>
 <div class="notice warning" th:if="${auditorium.legacyEquipmentWarning != null}" th:text="${auditorium.legacyEquipmentWarning}"></div>

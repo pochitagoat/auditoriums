@@ -41,10 +41,10 @@
         <a th:href="@{/departments}" th:classappend="${section == 'catalogs'} ? 'active'">Кафедры</a>
         <a th:href="@{/additional-equipment}">Типы оборудования</a>
     </nav>
-    <div class="sidebar-note"><strong>Все сведения под рукой</strong><p>Аудитории, оснащение и фотографии в одном месте.</p></div>
 </aside>
 <header class="topbar" th:fragment="topbar">
-    <span>Аудиторный фонд</span><span class="topbar-label">Университет</span>
+    <div class="account-actions" th:if="${authenticated}"><span th:text="${loginName}"></span><form method="post" th:action="@{/logout}"><button class="text-link" type="submit">Выйти</button></form></div>
+    <div class="account-actions" th:unless="${authenticated}"><span class="topbar-label">Для редактирования нужен аккаунт</span><a class="text-link" th:href="@{/login}">Войти</a><a class="button small" th:href="@{/register}">Регистрация</a></div>
 </header>
 <footer th:fragment="footer"><span>Аудитории 360</span><a th:href="@{/auditoriums}">Каталог аудиторий</a></footer>
 </body>

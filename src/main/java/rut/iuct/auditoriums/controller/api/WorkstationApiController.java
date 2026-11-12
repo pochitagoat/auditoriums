@@ -56,7 +56,7 @@ public class WorkstationApiController {
 
     @DeleteMapping("/workstations/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Идентификатор должен быть положительным") Long id,
-            @RequestParam String changedBy,
+            @RequestParam(required = false) String changedBy,
             @RequestParam @PositiveOrZero(message = "Версия не может быть отрицательной") Long version) {
         service.delete(id, changedBy, version);
         return ResponseEntity.noContent().build();

@@ -19,10 +19,12 @@ import java.util.Objects;
 public class AuditSupport {
     private final Validator validator;
     private final Clock clock;
+    private final AccountService accounts;
 
-    public AuditSupport(Validator validator, Clock clock) {
+    public AuditSupport(Validator validator, Clock clock, AccountService accounts) {
         this.validator = validator;
         this.clock = clock;
+        this.accounts = accounts;
     }
 
     public void validate(Object request, Class<?>... groups) {
@@ -42,9 +44,7 @@ public class AuditSupport {
     }
 
     public void validateDeletion(String changedBy, Long version) {
-        OperationRequest operation = new OperationRequest();
-        operation.setChangedBy(changedBy);
-        validate(operation);
+        accounts.currentFullName();
         requireVersion(version);
         if (version < 0) throw new ApiException(HttpStatus.BAD_REQUEST, "Версия не может быть отрицательной", Map.of("version", "Версия не может быть отрицательной"));
     }
@@ -62,23 +62,24 @@ public class AuditSupport {
     }
 
     public void touch(AuditedEntity entity, String changedBy) {
+        String author = accounts.currentFullName();
         LocalDateTime now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MICROS);
         // Даже две операции одного автора в одну микросекунду должны изменить аудит и @Version.
-        if (now.equals(entity.getLastModified()) && Objects.equals(entity.getChangedBy(), TextValues.required(changedBy))) {
+        if (now.equals(entity.getLastModified()) && Objects.equals(entity.getChangedBy(), author)) {
             now = now.plusNanos(1000);
         }
         entity.setLastModified(now);
-        entity.setChangedBy(TextValues.required(changedBy));
+        entity.setChangedBy(author);
     }
 
     public boolean changeStatus(WriteOffEquipment equipment, EquipmentStatus desired, StatusChangeRequest request) {
         validate(request);
         if (equipment.getStatus() == desired) return false;
         checkVersion(equipment, request.getVersion());
-        touch(equipment, request.getChangedBy());
+        touch(equipment, null);
         equipment.setStatus(desired);
         equipment.setWrittenOffAt(desired == EquipmentStatus.WRITTEN_OFF ? equipment.getLastModified() : null);
-        equipment.setWrittenOffBy(desired == EquipmentStatus.WRITTEN_OFF ? request.getChangedBy() : null);
+        equipment.setWrittenOffBy(desired == EquipmentStatus.WRITTEN_OFF ? accounts.currentFullName() : null);
         return true;
     }
 }

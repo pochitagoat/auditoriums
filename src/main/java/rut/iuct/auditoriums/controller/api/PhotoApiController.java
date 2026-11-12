@@ -22,7 +22,7 @@ public class PhotoApiController {
 
     @PostMapping(value = "/auditoriums/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PhotoResponse> upload(@PathVariable @Positive Long id, @RequestPart MultipartFile file,
-            @RequestParam String changedBy, @RequestParam Long auditoriumVersion) {
+            @RequestParam(required = false) String changedBy, @RequestParam Long auditoriumVersion) {
         PhotoResponse result = service.upload(id, file, changedBy, auditoriumVersion);
         return ResponseEntity.created(URI.create(result.getUrl())).body(result);
     }
@@ -38,7 +38,7 @@ public class PhotoApiController {
     }
 
     @DeleteMapping("/photos/{photoId}")
-    public ResponseEntity<Void> delete(@PathVariable @Positive Long photoId, @RequestParam String changedBy, @RequestParam Long version) {
+    public ResponseEntity<Void> delete(@PathVariable @Positive Long photoId, @RequestParam(required = false) String changedBy, @RequestParam Long version) {
         service.delete(photoId, changedBy, version);
         return ResponseEntity.noContent().build();
     }

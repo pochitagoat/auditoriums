@@ -32,6 +32,10 @@ p { margin-bottom:14px; }
 .workspace { min-width:0; }
 .topbar { background:#fff; border-bottom:1px solid var(--line); height:72px; padding:0 36px; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:13px; }
 .topbar-label { border:1px solid var(--line); padding:5px 12px; border-radius:20px; }
+.account-actions { display:flex; align-items:center; gap:12px; margin-left:auto; }
+.account-actions form { margin:0; }
+.auth-page { min-height:100vh; display:grid; place-items:center; padding:24px; background:#f5f7fb; }
+.auth-page .editor { width:min(100%, 480px); }
 main { max-width:1500px; margin:0 auto; padding:36px; }
 .page-heading { display:flex; justify-content:space-between; align-items:center; gap:24px; margin-bottom:28px; }
 .eyebrow { color:var(--blue); font-size:10px; font-weight:700; letter-spacing:1.6px; margin-bottom:9px; }
@@ -119,6 +123,7 @@ footer { padding:12px 36px 28px; display:flex; justify-content:space-between; co
 .inline-editor,.add-equipment { border-top:1px solid var(--line); margin-top:14px; }
 .inline-editor form,.add-equipment form { padding:16px 0; }
 .equipment-section>.add-equipment { margin:0; padding:8px 24px; background:#f9fbff; }
+.readonly .inline-editor, .readonly .add-equipment, .readonly .danger-zone, .readonly .upload-form, .readonly .linked-type details { display:none; }
 .danger-zone { margin:24px 0; border-top:1px solid var(--line); padding-top:8px; color:var(--muted); font-size:13px; }
 .danger-zone summary { color:#66758a; font-size:13px; }
 .danger-zone form { max-width:700px; }
